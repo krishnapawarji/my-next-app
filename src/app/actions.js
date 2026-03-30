@@ -5,10 +5,21 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const credsPath = path.join(process.cwd(), 'google-credentials.json');
-const credsRaw = fs.readFileSync(credsPath, 'utf8');
-const credsParsed = JSON.parse(credsRaw);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '../../');
+const credsPath = path.join(rootDir, 'google-credentials.json');
+
+let credsParsed;
+try {
+  const credsRaw = fs.readFileSync(credsPath, 'utf8');
+  credsParsed = JSON.parse(credsRaw);
+} catch (error) {
+  console.error(`Failed to read credentials from ${credsPath}:`, error.message);
+  throw new Error(`Google credentials not found at ${credsPath}`);
+}
 
 // User-provided Spreadsheet ID
 const SPREADSHEET_ID = '1Rs3oBtF-WDw0vMlYZS8wwWuL79jRJZBHjpqfmwrQI-k';
