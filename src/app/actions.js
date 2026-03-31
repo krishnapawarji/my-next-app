@@ -3,12 +3,22 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import fs from 'fs';
-import path from 'path';
+import dotenv from 'dotenv';
 
-const credsPath = path.join(process.cwd(), 'google-credentials.json');
-const credsRaw = fs.readFileSync(credsPath, 'utf8');
-const credsParsed = JSON.parse(credsRaw);
+dotenv.config();
+
+const credsParsed = {
+  type: process.env.GOOGLE_TYPE,
+  project_id: process.env.GOOGLE_PROJECT_ID,
+  private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+  private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  client_email: process.env.GOOGLE_CLIENT_EMAIL,
+  client_id: process.env.GOOGLE_CLIENT_ID,
+  auth_uri: process.env.GOOGLE_AUTH_URI,
+  token_uri: process.env.GOOGLE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_CERT_URL,
+  client_x509_cert_url: process.env.GOOGLE_CLIENT_CERT_URL
+};
 
 // User-provided Spreadsheet ID
 const SPREADSHEET_ID = '1Rs3oBtF-WDw0vMlYZS8wwWuL79jRJZBHjpqfmwrQI-k';
