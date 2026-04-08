@@ -26,8 +26,8 @@ const NAV = [
     group: 'PERSONAL',
     items: [
       { href: '/profile',    icon: User,     label: 'My Profile' },
-      { href: '#', icon: Plane,    label: 'Travel Expense' },
-      { href: '#', icon: Wallet,   label: 'Advance Salary' },
+      { href: '/travel-expense', icon: Plane, label: 'Travel Expense' },
+      { href: '/advance-salary', icon: Wallet,   label: 'Advance Salary' },
     ]
   },
 ];
@@ -78,36 +78,45 @@ export default function DashboardLayoutClient({ children, user }) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1 relative z-10 custom-scrollbar">
-          {NAV.map(({ group, items }) => (
-            <div key={group || 'main'} className={group ? 'mt-8' : ''}>
-              {group && (
-                <div className="px-4 mb-3 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">
-                  {group}
-                </div>
-              )}
-              {items.map(({ href, icon: Icon, label }) => {
-                const active = isActive(href);
-                return (
-                  <Link key={label} href={href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 relative group no-underline
-                      ${active ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
-                    onMouseEnter={() => setHovered(label)}
-                    onMouseLeave={() => setHovered(null)}
-                  >
-                    {active && (
-                      <div className="absolute inset-0 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-600/30 ring-1 ring-white/10" />
-                    )}
-                    {!active && hovered === label && (
-                      <div className="absolute inset-0 rounded-2xl bg-white/5" />
-                    )}
-                    <Icon size={18} className={`relative z-10 shrink-0 transition-transform duration-300 group-hover:scale-110 ${active ? 'text-white' : 'text-slate-500'}`} />
-                    <span className="relative z-10 flex-1">{label}</span>
-                    {active && <ChevronRight size={14} className="relative z-10 opacity-60" />}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+          {(() => {
+            const itemsToRender = [...NAV];
+            if (user?.role === 'HR') {
+              itemsToRender.push({
+                group: 'ADMINISTRATION',
+                items: [{ href: '/employee-database', icon: User, label: 'Employee Database' }]
+              });
+            }
+            return itemsToRender.map(({ group, items }) => (
+              <div key={group || 'main'} className={group ? 'mt-8' : ''}>
+                {group && (
+                  <div className="px-4 mb-3 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">
+                    {group}
+                  </div>
+                )}
+                {items.map(({ href, icon: Icon, label }) => {
+                  const active = isActive(href);
+                  return (
+                    <Link key={label} href={href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all duration-300 relative group no-underline
+                        ${active ? 'text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                      onMouseEnter={() => setHovered(label)}
+                      onMouseLeave={() => setHovered(null)}
+                    >
+                      {active && (
+                        <div className="absolute inset-0 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-600/30 ring-1 ring-white/10" />
+                      )}
+                      {!active && hovered === label && (
+                        <div className="absolute inset-0 rounded-2xl bg-white/5" />
+                      )}
+                      <Icon size={18} className={`relative z-10 shrink-0 transition-transform duration-300 group-hover:scale-110 ${active ? 'text-white' : 'text-slate-500'}`} />
+                      <span className="relative z-10 flex-1">{label}</span>
+                      {active && <ChevronRight size={14} className="relative z-10 opacity-60" />}
+                    </Link>
+                  );
+                })}
+              </div>
+            ));
+          })()}
         </nav>
 
         {/* User Card */}

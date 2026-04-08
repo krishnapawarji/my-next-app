@@ -12,6 +12,7 @@ const MANAGERS    = ['Rahul Yadav','Madhavi Joshi','Nikita Sharma'];
 function StatusBadge({ status }) {
   const map = {
     'Pending':  { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100' },
+    'Approved by Manager': { bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-100' },
     'Approved': { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
     'Rejected': { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100' },
   };
@@ -37,9 +38,11 @@ export default function LeaveActionsPage({
   myHistory = [], 
   teamPending = [], 
   teamHistory = [], 
-  sessionUser = null 
+  sessionUser = null
 }) {
   const [activePortalTab, setActivePortalTab] = useState('My History');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showApplyModal, setShowApplyModal]   = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -128,7 +131,7 @@ export default function LeaveActionsPage({
     }
   };
 
-  const isManager = sessionUser?.role === 'Manager';
+  const canViewDashboard = sessionUser?.role === 'Manager' || sessionUser?.role === 'HR';
   const inputClass = "w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-[13px] font-bold text-slate-700 outline-none focus:border-indigo-300 focus:bg-white transition-all placeholder:text-slate-300";
 
   return (
@@ -142,11 +145,11 @@ export default function LeaveActionsPage({
             className={`px-8 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activePortalTab === 'My History' ? 'bg-white text-indigo-700 shadow-xl shadow-indigo-100/20' : 'text-slate-400 hover:text-slate-600'}`}>
             My Balance
           </button>
-          {isManager && (
+          {canViewDashboard && (
             <button 
               onClick={() => setActivePortalTab('Manager Dashboard')}
               className={`px-8 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activePortalTab === 'Manager Dashboard' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200' : 'text-slate-400 hover:text-slate-600'}`}>
-              Team Requests
+              {sessionUser?.role === 'HR' ? 'HR Approval Desk' : 'Team Requests'}
             </button>
           )}
         </div>
@@ -247,7 +250,9 @@ export default function LeaveActionsPage({
               <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
                 <Clock size={16} fill="currentColor" className="opacity-20" />
               </div>
-              <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Pending Requests Workspace</h2>
+              <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+                {sessionUser?.role === 'HR' ? 'HR Pending Authorization' : 'Pending Requests Workspace'}
+              </h2>
             </div>
             
             <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden min-h-[200px]">
@@ -492,8 +497,8 @@ export default function LeaveActionsPage({
                          onClick={() => handleApprovalAction('Approved')}
                          disabled={isLoading}
                          className="flex-[1.5] py-4 bg-slate-900 text-white font-black rounded-3xl shadow-2xl hover:bg-indigo-600 active:scale-95 transition-all flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em] relative overflow-hidden">
-                         <ThumbsUp size={16} /> Authorize Request
-                       </button>
+                          <ThumbsUp size={16} /> {sessionUser?.role === 'HR' ? 'Grant Final Approval' : 'Authorize & Route to HR'}
+                        </button>
                     </div>
                   </div>
                 </>
